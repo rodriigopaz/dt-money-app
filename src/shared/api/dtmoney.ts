@@ -1,3 +1,5 @@
+import { AppError } from "@/shared/helpers/appError";
+import { addTokenToRequest } from "@/shared/helpers/axios.helper";
 import axios from "axios";
 import { Platform } from "react-native";
 
@@ -9,3 +11,16 @@ const baseURL = Platform.select({
 export const dtMoneyApi = axios.create({
   baseURL,
 });
+
+addTokenToRequest(dtMoneyApi);
+
+dtMoneyApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.data) {
+      return Promise.reject(new AppError(error.response.data.message));
+    }
+
+    return Promise.reject(new AppError("Falha na requisição"));
+  },
+);
