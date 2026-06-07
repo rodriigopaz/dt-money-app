@@ -10,7 +10,7 @@ export const getTransactionCategories = async (): Promise<
   TransactionCategory[]
 > => {
   const { data } = await dtMoneyApi.get<TransactionCategory[]>(
-    "/transaction/category",
+    "/transaction/categories",
   );
 
   return data;

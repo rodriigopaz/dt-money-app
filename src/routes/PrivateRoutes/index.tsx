@@ -1,12 +1,12 @@
 import { Home } from "@/screens/Home"
-import { createStackNavigator } from "@react-navigation/stack"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
 export type PrivateStackParamsList = {
   Home: undefined
 }
 
 export const PrivateRoutes = () => {
-  const PrivateStack = createStackNavigator<PrivateStackParamsList>()
+  const PrivateStack = createNativeStackNavigator<PrivateStackParamsList>()
 
   return (
     <PrivateStack.Navigator screenOptions={{ headerShown: false }}>

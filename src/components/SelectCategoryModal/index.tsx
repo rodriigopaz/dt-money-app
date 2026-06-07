@@ -1,8 +1,16 @@
 import { useTransactionContext } from "@/context/transaction.context";
+import { useSnackbarContext } from "@/context/snackbar.context";
 import Checkbox from "expo-checkbox";
 import clsx from "clsx";
-import { FC, useMemo, useState } from "react";
-import { FlatList, Modal, Text, TouchableOpacity, View } from "react-native";
+import { FC, useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Modal,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface SelectCategoryModalProps {
   selectedCategory: number;
@@ -13,14 +21,34 @@ export const SelectCategoryModal: FC<SelectCategoryModalProps> = ({
   selectedCategory,
   onSelect,
 }) => {
-  const { categories } = useTransactionContext();
+  const { categories, fetchCategories } = useTransactionContext();
+  const { notify } = useSnackbarContext();
 
   const [showModal, setShowModal] = useState(false);
+  const [loadingCategories, setLoadingCategories] = useState(false);
 
   const selected = useMemo(
     () => categories.find((category) => category.id === selectedCategory),
     [categories, selectedCategory],
   );
+
+  useEffect(() => {
+    if (!showModal) return;
+
+    const load = async () => {
+      setLoadingCategories(true);
+      try {
+        await fetchCategories();
+      } catch (error) {
+        console.error("[SelectCategoryModal] fetchCategories error:", error);
+        notify({ message: "Falha ao buscar categorias", messageType: "error" });
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    load();
+  }, [showModal]);
 
   const handleModal = () => {
     setShowModal((prevState) => !prevState);
@@ -51,26 +79,30 @@ export const SelectCategoryModal: FC<SelectCategoryModalProps> = ({
               Selecione uma categoria
             </Text>
 
-            <FlatList
-              data={categories}
-              keyExtractor={(item) => `category-${item.id}`}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  className="flex-row items-center bg-gray-800 rounded-lg mb-2 p-4"
-                  onPress={() => handleSelect(item.id)}
-                >
-                  <Checkbox
-                    className="mr-2"
-                    value={selected?.id === item.id}
-                    onValueChange={() => handleSelect(item.id)}
-                  />
+            {loadingCategories ? (
+              <ActivityIndicator color="white" size="large" />
+            ) : (
+              <FlatList
+                data={categories}
+                keyExtractor={(item) => `category-${item.id}`}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    className="flex-row items-center bg-gray-800 rounded-lg mb-2 p-4"
+                    onPress={() => handleSelect(item.id)}
+                  >
+                    <Checkbox
+                      className="mr-2"
+                      value={selected?.id === item.id}
+                      onValueChange={() => handleSelect(item.id)}
+                    />
 
-                  <Text className="text-white text-center text-lg">
-                    {item.name}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
+                    <Text className="text-white text-center text-lg">
+                      {item.name}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              />
+            )}
           </View>
         </View>
       </Modal>

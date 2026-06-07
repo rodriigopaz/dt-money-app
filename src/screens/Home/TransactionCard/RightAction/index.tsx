@@ -1,4 +1,5 @@
 import { useSnackbarContext } from "@/context/snackbar.context";
+import { useTransactionContext } from "@/context/transaction.context";
 import { colors } from "@/shared/colors";
 import { useErrorHandler } from "@/shared/hooks/useErrorHandler";
 import * as TransactionService from "@/shared/services/dtMoney/transaction.service";
@@ -15,6 +16,7 @@ interface RightActionProps {
 export const RightAction: FC<RightActionProps> = ({ transactionId }) => {
   const { errorHandler } = useErrorHandler();
   const { notify } = useSnackbarContext();
+  const { refreshTransactions } = useTransactionContext();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,6 +34,7 @@ export const RightAction: FC<RightActionProps> = ({ transactionId }) => {
       setLoading(true);
 
       await TransactionService.deleteTransaction(transactionId);
+      await refreshTransactions();
 
       notify({
         message: "Transação deletada com sucesso",

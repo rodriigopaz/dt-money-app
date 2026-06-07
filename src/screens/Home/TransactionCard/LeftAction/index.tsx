@@ -3,8 +3,7 @@ import { colors } from "@/shared/colors";
 import { Transaction } from "@/shared/interfaces/transaction";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FC } from "react";
-import { View } from "react-native";
-import { Pressable } from "react-native-gesture-handler";
+import { TouchableOpacity, View } from "react-native";
 
 import { EditTransactionForm } from "./EditTransactionForm";
 
@@ -16,7 +15,7 @@ export const LeftAction: FC<LeftActionProps> = ({ transaction }) => {
   const { openBottomSheet } = useBottomSheetContext();
 
   return (
-    <Pressable
+    <TouchableOpacity
       onPress={() =>
         openBottomSheet(<EditTransactionForm transaction={transaction} />, 1)
       }
@@ -24,6 +23,6 @@ export const LeftAction: FC<LeftActionProps> = ({ transaction }) => {
       <View className="h-[140px] bg-accent-blue-dark w-[80px] rounded-l-6 items-center justify-center">
         <MaterialIcons name="edit" size={30} color={colors.white} />
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 };
